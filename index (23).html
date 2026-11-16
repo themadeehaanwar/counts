@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Counts</title>
+<meta name="theme-color" content="#8E9AE6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Counts">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F4F6FB;
+    --card: #FFFFFF;
+    --ink: #2B3045;
+    --ink-soft: #666C85;
+    --line: #E3E7F2;
+    --accent: #8E9AE6;
+    --accent-deep: #5F6BC4;
+    --rough: #C9B8E8;
+    --meh: #B9C7D9;
+    --okay: #BFE0D2;
+    --good: #F4E1A9;
+    --glowing: #F5C1C8;
+    --radius: 20px;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 17px;
+    line-height: 1.55;
+    min-height: 100vh;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+  main { max-width: 560px; margin: 0 auto; padding: 28px 20px 64px; }
+  h1 { font-size: 1.1rem; font-weight: 800; letter-spacing: .02em; margin: 0; color: var(--accent-deep); }
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
+  h2 { font-size: 1.9rem; line-height: 1.2; font-weight: 800; margin: 0 0 18px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+  .stack > * + * { margin-top: 16px; }
+  label { display: block; font-weight: 600; font-size: .95rem; margin-bottom: 6px; color: var(--ink-soft); }
+  input[type=text], input[type=email], input[type=password] {
+    width: 100%; font: inherit; color: var(--ink); background: var(--bg);
+    border: 2px solid var(--line); border-radius: 14px; padding: 14px 16px;
+  }
+  input:focus-visible, button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  button { font: inherit; cursor: pointer; }
+  .btn {
+    background: var(--accent-deep); color: #fff; border: 0; border-radius: 14px;
+    padding: 14px 22px; font-weight: 800; width: 100%;
+  }
+  .btn:disabled { opacity: .55; cursor: default; }
+  .btn.soft { background: #E8EBFA; color: var(--accent-deep); }
+  .link { background: none; border: 0; color: var(--accent-deep); font-weight: 600; padding: 8px 4px; text-decoration: underline; text-underline-offset: 3px; }
+  .moods { display: flex; gap: 10px; flex-wrap: wrap; }
+  .mood {
+    border: 2px solid transparent; border-radius: 999px; padding: 8px 14px; font-weight: 600; font-size: .9rem;
+    color: var(--ink);
+  }
+  .mood[data-mood=rough] { background: var(--rough); }
+  .mood[data-mood=meh] { background: var(--meh); }
+  .mood[data-mood=okay] { background: var(--okay); }
+  .mood[data-mood=good] { background: var(--good); }
+  .mood[data-mood=glowing] { background: var(--glowing); }
+  .mood[aria-pressed=true] { border-color: var(--ink); }
+  .note { min-height: 1.6em; margin: 0; color: var(--accent-deep); font-weight: 600; }
+  .error { color: #B0405A; font-weight: 600; margin: 0; min-height: 1.4em; }
+  .summary { display: flex; gap: 12px; margin-top: 16px; }
+  .summary .card { flex: 1; text-align: center; padding: 16px 12px; }
+  .summary b { display: block; font-size: 1.7rem; font-weight: 800; color: var(--accent-deep); line-height: 1.2; }
+  .summary span { font-size: .85rem; color: var(--ink-soft); }
+  .rough-day { margin-top: 16px; }
+  .win-card { background: #EEF1FD; border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 20px; margin-top: 12px; }
+  .win-card p { margin: 0 0 4px; font-size: 1.15rem; font-weight: 600; }
+  .win-card small { color: var(--ink-soft); }
+  .day { margin-top: 28px; }
+  .day h3 { margin: 0 0 8px; font-size: .95rem; color: var(--ink-soft); font-weight: 600; }
+  .entry { display: flex; align-items: flex-start; gap: 12px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; }
+  .entry + .entry { margin-top: 8px; }
+  .dot { flex: none; width: 14px; height: 14px; border-radius: 50%; margin-top: 7px; background: var(--line); }
+  .dot[data-mood=rough] { background: var(--rough); }
+  .dot[data-mood=meh] { background: var(--meh); }
+  .dot[data-mood=okay] { background: var(--okay); }
+  .dot[data-mood=good] { background: var(--good); }
+  .dot[data-mood=glowing] { background: var(--glowing); }
+  .entry p { margin: 0; flex: 1; word-break: break-word; }
+  .del { flex: none; background: none; border: 0; color: var(--ink-soft); font-size: 1.2rem; padding: 2px 8px; border-radius: 8px; }
+  .empty { color: var(--ink-soft); margin-top: 28px; }
+  footer { margin-top: 40px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .hidden { display: none !important; }
+  @media (prefers-reduced-motion: no-preference) {
+    .win-card { animation: soften .35s ease-out; }
+    @keyframes soften { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Counts</h1>
+    <button class="link hidden" id="signout" type="button">Sign out</button>
+  </header>
+
+  <!-- Sign in -->
+  <section id="auth" class="hidden">
+    <h2>Welcome. Small things count here.</h2>
+    <form class="card stack" id="auth-form" autocomplete="on">
+      <div>
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" autocomplete="email" required>
+      </div>
+      <div>
+        <label for="password">Password (6 or more characters)</label>
+        <input type="password" id="password" name="password" autocomplete="current-password" minlength="6" required>
+      </div>
+      <p class="error" id="auth-error" role="alert"></p>
+      <button class="btn" id="auth-submit" type="submit">Sign in</button>
+      <button class="link" id="auth-toggle" type="button">New here? Create an account</button>
+    </form>
+  </section>
+
+  <!-- App -->
+  <section id="app" class="hidden">
+    <h2>What counted today?</h2>
+    <form class="card stack" id="win-form">
+      <div>
+        <label for="note">One line is plenty</label>
+        <input type="text" id="note" maxlength="280" placeholder="Drank water. Sent one email." autocomplete="off" required>
+      </div>
+      <div>
+        <label id="mood-label">How did it feel? (optional)</label>
+        <div class="moods" role="group" aria-labelledby="mood-label" id="moods">
+          <button type="button" class="mood" data-mood="rough" aria-pressed="false">Rough</button>
+          <button type="button" class="mood" data-mood="meh" aria-pressed="false">Meh</button>
+          <button type="button" class="mood" data-mood="okay" aria-pressed="false">Okay</button>
+          <button type="button" class="mood" data-mood="good" aria-pressed="false">Good</button>
+          <button type="button" class="mood" data-mood="glowing" aria-pressed="false">Glowing</button>
+        </div>
+      </div>
+      <button class="btn" id="save" type="submit">Save</button>
+      <p class="note" id="note-msg" aria-live="polite"></p>
+    </form>
+
+    <div class="summary">
+      <div class="card"><b id="count-month">0</b><span id="count-month-label">things this month</span></div>
+      <div class="card"><b id="days-month">0</b><span id="days-month-label">days with a win</span></div>
+    </div>
+
+    <div class="rough-day">
+      <button class="btn soft" id="rough-btn" type="button">Rough day? Show me a past win</button>
+      <div id="rough-out" aria-live="polite"></div>
+    </div>
+
+    <div id="list"></div>
+
+    <footer>
+      <button class="link" id="export" type="button">Export backup</button>
+    </footer>
+  </section>
+
+  <p class="error" id="global-error" role="alert"></p>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function () {
+  "use strict";
+
+  // These two values are public by design. Your data is protected by your login
+  // and the row-level security rules created by setup.sql.
+  var SUPABASE_URL = "https://qwjksdustvsxvzdsuuqs.supabase.co";
+  var SUPABASE_KEY = "sb_publishable_nnK7kUrs8Dt09HJYugHxyQ_F-XbEPMD";
+
+  var CACHE_KEY = "counts-cache-v1";
+  var KIND_WORDS = [
+    "That counts.", "Counted.", "You are trying, and that counts.",
+    "Saved. Small things add up.", "Noted. Well done."
+  ];
+
+  var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  var wins = [];
+  var mood = null;
+  var signingUp = false;
+  var lastRoughId = null;
+
+  function $(id) { return document.getElementById(id); }
+
+  function pad(n) { return n < 10 ? "0" + n : "" + n; }
+  function localDay(d) {
+    d = d || new Date();
+    return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+  }
+  function parseDay(s) {
+    var p = s.split("-");
+    return new Date(+p[0], +p[1] - 1, +p[2]);
+  }
+  function dayLabel(s) {
+    if (s === localDay()) return "Today";
+    var y = new Date(); y.setDate(y.getDate() - 1);
+    if (s === localDay(y)) return "Yesterday";
+    return parseDay(s).toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" });
+  }
+  function plural(n, one, many) { return n === 1 ? one : many; }
+
+  function showError(msg) { $("global-error").textContent = msg || ""; }
+
+  function show(section) {
+    $("auth").classList.toggle("hidden", section !== "auth");
+    $("app").classList.toggle("hidden", section !== "app");
+    $("signout").classList.toggle("hidden", section !== "app");
+  }
+
+  /* ---------- data ---------- */
+  function saveCache() {
+    try { localStorage.setItem(CACHE_KEY, JSON.stringify(wins)); } catch (e) {}
+  }
+  function loadCache() {
+    try { return JSON.parse(localStorage.getItem(CACHE_KEY) || "[]"); } catch (e) { return []; }
+  }
+
+  function loadWins() {
+    return sb.from("wins").select("*").order("created_at", { ascending: false }).limit(2000)
+      .then(function (res) {
+        if (res.error) throw res.error;
+        wins = res.data || [];
+        saveCache();
+        showError("");
+        render();
+      })
+      .catch(function () {
+        wins = loadCache();
+        showError("Could not reach the server, so this may be out of date. Try again when you are online.");
+        render();
+      });
+  }
+
+  /* ---------- render ---------- */
+  function render() {
+    var now = new Date();
+    var ym = now.getFullYear() + "-" + pad(now.getMonth() + 1);
+    var monthWins = wins.filter(function (w) { return w.day.indexOf(ym) === 0; });
+    var days = {};
+    monthWins.forEach(function (w) { days[w.day] = true; });
+    var nDays = Object.keys(days).length;
+    $("count-month").textContent = monthWins.length;
+    $("count-month-label").textContent = plural(monthWins.length, "thing this month", "things this month");
+    $("days-month").textContent = nDays;
+    $("days-month-label").textContent = plural(nDays, "day with a win", "days with a win");
+
+    var list = $("list");
+    list.textContent = "";
+    if (!wins.length) {
+      var e = document.createElement("p");
+      e.className = "empty";
+      e.textContent = "Nothing here yet. Small things count: drank water, replied to one message, got out of bed.";
+      list.appendChild(e);
+      return;
+    }
+
+    var groups = [];
+    var byDay = {};
+    wins.slice().sort(function (a, b) {
+      if (a.day !== b.day) return a.day < b.day ? 1 : -1;
+      return a.created_at < b.created_at ? 1 : -1;
+    }).forEach(function (w) {
+      if (!byDay[w.day]) { byDay[w.day] = []; groups.push(w.day); }
+      byDay[w.day].push(w);
+    });
+
+    groups.forEach(function (day) {
+      var wrap = document.createElement("div");
+      wrap.className = "day";
+      var h = document.createElement("h3");
+      h.textContent = dayLabel(day);
+      wrap.appendChild(h);
+      byDay[day].forEach(function (w) {
+        var row = document.createElement("div");
+        row.className = "entry";
+        var dot = document.createElement("span");
+        dot.className = "dot";
+        if (w.mood) dot.setAttribute("data-mood", w.mood);
+        dot.setAttribute("aria-hidden", "true");
+        var p = document.createElement("p");
+        p.textContent = w.note;
+        var del = document.createElement("button");
+        del.type = "button";
+        del.className = "del";
+        del.setAttribute("aria-label", "Delete this entry");
+        del.textContent = "×";
+        del.addEventListener("click", function () { removeWin(w); });
+        row.appendChild(dot); row.appendChild(p); row.appendChild(del);
+        wrap.appendChild(row);
+      });
+      list.appendChild(wrap);
+    });
+  }
+
+  /* ---------- actions ---------- */
+  function addWin(note) {
+    var btn = $("save");
+    btn.disabled = true;
+    return sb.from("wins").insert({ note: note, mood: mood, day: localDay() }).select().single()
+      .then(function (res) {
+        if (res.error) throw res.error;
+        wins.unshift(res.data);
+        saveCache();
+        $("note").value = "";
+        setMood(null);
+        $("note-msg").textContent = KIND_WORDS[Math.floor(Math.random() * KIND_WORDS.length)];
+        showError("");
+        render();
+      })
+      .catch(function () {
+        showError("That did not save. Check your connection and try again. Your text is still in the box.");
+      })
+      .then(function () { btn.disabled = false; });
+  }
+
+  function removeWin(w) {
+    if (!window.confirm("Delete this entry?")) return;
+    sb.from("wins").delete().eq("id", w.id).then(function (res) {
+      if (res.error) { showError("Could not delete. Try again."); return; }
+      wins = wins.filter(function (x) { return x.id !== w.id; });
+      saveCache();
+      render();
+    });
+  }
+
+  function setMood(m) {
+    mood = m;
+    Array.prototype.forEach.call(document.querySelectorAll(".mood"), function (b) {
+      b.setAttribute("aria-pressed", String(b.getAttribute("data-mood") === m));
+    });
+  }
+
+  function showRoughDay() {
+    var out = $("rough-out");
+    out.textContent = "";
+    if (!wins.length) {
+      var p0 = document.createElement("p");
+      p0.className = "empty";
+      p0.textContent = "No past wins yet. Add one above, even a tiny one, and it will be here for the next hard day.";
+      out.appendChild(p0);
+      return;
+    }
+    var pool = wins.filter(function (w) { return w.id !== lastRoughId; });
+    if (!pool.length) pool = wins;
+    var w = pool[Math.floor(Math.random() * pool.length)];
+    lastRoughId = w.id;
+    var card = document.createElement("div");
+    card.className = "win-card";
+    var p = document.createElement("p");
+    p.textContent = w.note;
+    var s = document.createElement("small");
+    s.textContent = "You did this on " + parseDay(w.day).toLocaleDateString(undefined, { day: "numeric", month: "long" }) + ". It counted then, and it counts now.";
+    card.appendChild(p); card.appendChild(s);
+    out.appendChild(card);
+  }
+
+  function exportBackup() {
+    var blob = new Blob([JSON.stringify(wins, null, 2)], { type: "application/json" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "counts-backup-" + localDay() + ".json";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+  }
+
+  /* ---------- auth ---------- */
+  function setAuthMode(isSignUp) {
+    signingUp = isSignUp;
+    $("auth-submit").textContent = isSignUp ? "Create account" : "Sign in";
+    $("auth-toggle").textContent = isSignUp ? "Already have an account? Sign in" : "New here? Create an account";
+    $("password").setAttribute("autocomplete", isSignUp ? "new-password" : "current-password");
+    $("auth-error").textContent = "";
+  }
+
+  function friendlyAuthError(err) {
+    var m = (err && err.message || "").toLowerCase();
+    if (m.indexOf("invalid login") >= 0) return "That email and password do not match. Check them and try again.";
+    if (m.indexOf("already registered") >= 0) return "That email already has an account. Choose Sign in.";
+    if (m.indexOf("email not confirmed") >= 0) return "Please confirm your email first, using the link we sent you.";
+    if (m.indexOf("password") >= 0) return "Use a password with at least 6 characters.";
+    return "Something went wrong. Check your connection and try again.";
+  }
+
+  $("auth-form").addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var email = $("email").value.trim();
+    var password = $("password").value;
+    var btn = $("auth-submit");
+    btn.disabled = true;
+    $("auth-error").textContent = "";
+    var req = signingUp
+      ? sb.auth.signUp({ email: email, password: password })
+      : sb.auth.signInWithPassword({ email: email, password: password });
+    req.then(function (res) {
+      if (res.error) throw res.error;
+      if (!res.data.session) {
+        $("auth-error").textContent = "Account created. Check your email for a confirmation link, then sign in.";
+        setAuthMode(false);
+      }
+    }).catch(function (err) {
+      $("auth-error").textContent = friendlyAuthError(err);
+    }).then(function () { btn.disabled = false; });
+  });
+
+  $("auth-toggle").addEventListener("click", function () { setAuthMode(!signingUp); });
+
+  $("signout").addEventListener("click", function () {
+    sb.auth.signOut().then(function () {
+      wins = [];
+      try { localStorage.removeItem(CACHE_KEY); } catch (e) {}
+    });
+  });
+
+  /* ---------- wiring ---------- */
+  $("win-form").addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var note = $("note").value.trim();
+    if (!note) return;
+    $("note-msg").textContent = "";
+    addWin(note);
+  });
+  $("moods").addEventListener("click", function (ev) {
+    var b = ev.target.closest(".mood");
+    if (!b) return;
+    var m = b.getAttribute("data-mood");
+    setMood(mood === m ? null : m);
+  });
+  $("rough-btn").addEventListener("click", showRoughDay);
+  $("export").addEventListener("click", exportBackup);
+
+  function onSession(session) {
+    if (session) {
+      show("app");
+      wins = loadCache();
+      render();
+      loadWins();
+    } else {
+      show("auth");
+    }
+  }
+
+  sb.auth.onAuthStateChange(function (_event, session) { onSession(session); });
+  sb.auth.getSession().then(function (res) { onSession(res.data && res.data.session); });
+
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("sw.js").catch(function () {});
+    });
+  }
+})();
+</script>
+</body>
+</html>
